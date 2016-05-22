@@ -27,7 +27,7 @@ SOFTWARE.
 
 
 # PapaParse License
-(See https://github.com/mholt/PapaParse/blob/master/LICENSE)
+(From https://github.com/mholt/PapaParse/blob/master/LICENSE)
 
 The MIT License (MIT)
 
