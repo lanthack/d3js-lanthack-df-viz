@@ -53,15 +53,19 @@ function parseFile() {
     // Collect information about the data
     collectDataInfo();
 
+    // Debug
     printFile(dataset);
-    makeClassPieChart(300, 300);
+
+    // Make the plots
+    // makeClassPieChart(300, 300);
+    makeHistogram2(dataset.listData[dataset.columnNames[0]]);
 }
 
 var printFileDetails = function(f) {
     console.log(f.name);
     console.log(f.size);
     d3.select('body').append('p').text('File Name: ' + f.name);
-    d3.select('body').append('p').text('File Size: ' + f.size + 'bytes');
+    d3.select('body').append('p').text('File Size: ' + f.size + ' bytes');
     d3.select('body').append('p').text('File Type: ' + f.type);
 }
 
@@ -138,65 +142,3 @@ var printFile = function(ds) {
         return row;
       })
 }
-
-// -----------------------------------------------------------------------
-// Class Pie Chart
-// -----------------------------------------------------------------------
-
-var makeClassPieChart = function(width, height) {
-    nv.addGraph(function() {
-        var chart = nv.models.pieChart()
-            .donut(true)
-            .width(width)
-            .height(height)
-            .x(function(x) { console.log(x); return x })
-            .y(function(x) { return 1 })
-            .color(function(d, i) { return "red" })
-            .legendPosition("right")
-            // .labelType('key')
-            .padAngle(.03)
-            .cornerRadius(5)
-
-        d3.select("#classPieChart")
-        .datum(dataset.types)
-        .transition().duration(1200)
-        .attr('width', width)
-        .attr('height', height)
-        .call(chart);
-
-        return chart;
-    });
-}
-
-
-// var makeClassPieChart = function(width, height) {
-//     nv.addGraph(function() {
-//         var classPieChartData = [];
-//         for (var i = 0; i < dataset.columnNames.length; i++) {
-//             classPieChartData[i] = { column: dataset.columnNames[i], value: 1 };
-//         }
-
-//         var chart = nv.models.pie()
-//         .x(function(d) { return d.column; })
-//         .y(function(d) { return d.value; })
-//         .width(width)
-//         .height(height)
-//         .labelType('percent')
-//         .valueFormat(d3.format('%'))
-//         .donut(true);
-
-//         d3.select("#classPieChart")
-//         .datum([classPieChartData])
-//         .transition().duration(1200)
-//         .attr('width', width)
-//         .attr('height', height)
-//         .call(chart);
-
-//         return chart;
-//     });
-// }
-
-
-
-
-// Main
