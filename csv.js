@@ -3,6 +3,10 @@
 // -----------------------------------------------------------------------
 var fileInfo = {};
 var dataset = {};
+var typeColors = {"integer": "#1f77b4",
+                  "float": "#ff7f0e",
+                  "date": "#2ca02c",
+                  "string": "#d62728"}
 
 // -----------------------------------------------------------------------
 // Type checking function
@@ -50,6 +54,7 @@ function parseFile() {
         dynamicTyping: true
     }).data
 
+
     // Collect information about the data
     collectDataInfo();
 
@@ -57,7 +62,7 @@ function parseFile() {
     printFile(dataset);
 
     // Make the plots
-    // makeClassPieChart(300, 300);
+    makeClassPieChart(350, 350);
     makeHistogram(dataset.listData[dataset.columnNames[0]]);
     makeScatterChartByIndex(dataset.listData[dataset.columnNames[0]], dataset.columnNames[0]);
 
@@ -80,7 +85,9 @@ var collectDataInfo = function() {
     // If there are spaces around the columns, those are preserved.
     dataset.columnNames = [];
     for (var key in dataset.data[0]) {
-        if (dataset.data[0].hasOwnProperty(key)) dataset.columnNames.push(key);
+        if (dataset.data[0].hasOwnProperty(key) && key != "__parsed_extra")  {
+            dataset.columnNames.push(key);
+        }
     }
 
     // Get number of rows and columns

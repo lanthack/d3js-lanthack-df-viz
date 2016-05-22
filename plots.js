@@ -1,27 +1,49 @@
-// var makeClassPieChart = function(width, height) {
-//     nv.addGraph(function() {
-//         var chart = nv.models.pieChart()
-//             .donut(true)
-//             .width(width)
-//             .height(height)
-//             .x(function(x) { console.log(x); return x })
-//             .y(function(x) { return 1 })
-//             // .color(function(d, i) { return "red" })
-//             // .legendPosition("right")
-//             .labelType('key')
-//             .padAngle(.03)
-//             .cornerRadius(5)
+var makeClassPieChart = function(width, height) {
+    console.log("starting pie chart");
 
-//         d3.select("#classPieChart")
-//         .datum(dataset.types)
-//         .transition().duration(1200)
-//         .attr('width', width)
-//         .attr('height', height)
-//         .call(chart);
+    var prepData = function() {
+        var data = [];
+        for (var j = 0; j < dataset.types.length; j++) {
+            data.push({
+                columnName: dataset.columnNames[j],
+                type: dataset.types[j],
+                value: 1,
+                color: typeColors[dataset.types[j]]
+            })
+        }
+        return data;
+    }
 
-//         return chart;
-//     });
-// }
+    var chart;
+    var data = prepData();
+    var colors = [];
+    for (var j = 0; j < data.length; j++) {
+        colors.push(data[j].color)
+    }
+    console.log(colors);
+    nv.addGraph(function() {
+        chart = nv.models.pie()
+            .x(function(d) { return d.columnName; })
+            .y(function(d) { return d.value; })
+            .color(colors)
+            .donut(true)
+            .width(width)
+            .height(height)
+            .padAngle(.06)
+            .cornerRadius(5)
+            .labelType("key")
+
+        chart.title("Columns");
+
+        d3.select("#classPieChart")
+            .datum([data])
+            .attr("width", width)
+            .attr("height", height)
+            .call(chart);
+
+        return chart;
+    });
+}
 
 var makeScatterChartByIndex = function(values, columnName) {
     console.log(values);
@@ -55,10 +77,15 @@ var makeScatterChartByIndex = function(values, columnName) {
         chart.dispatch.on('renderEnd', function(){
             console.log('render complete');
         });
-        chart.xAxis.tickFormat(d3.format('d'));
-        chart.yAxis.tickFormat(d3.format('.02f'));
+        chart.xAxis
+            .axisLabel("Index")
+            .tickFormat(d3.format('d'));
+        chart.yAxis
+            .axisLabel(columnName)
+            .tickFormat(d3.format('.02f'));
 
-        d3.select('#scatterChart')
+        d3.select('body')
+            .append('svg')
             .datum(nv.log(prepData(values)))
             .call(chart);
         nv.utils.windowResize(chart.update);
