@@ -6,12 +6,26 @@
     <!-- Load D3 from the web -->
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
+    <!-- Load NVD3 -->
+    <link rel="stylesheet" type="text/css" href="nv.d3.css"/>
+    <script src="nv.d3.js"></script>
+
+    <!-- Load PapaParse to parse CSV files -->
+    <script src="papaparse.js"></script>
+
+    <!-- Custom CSS -->
+    <!-- <link rel="stylesheet" type="text/css" href="custom.css"/> -->
+
 </head>
 <body>
     <div>
         <label for="fileselect">Files to upload:</label>
         <input type="file" id="fileInput", onchange="loadFile()">
         <div id="filedrag">or drop files here</div>
+    </div>
+
+    <div id="classPieChartDiv">
+        <svg id="classPieChart"></svg>
     </div>
 
     <script type="text/javascript" src="custom.js"></script>

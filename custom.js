@@ -1,66 +1,177 @@
-// File Input & Parsing
+// -----------------------------------------------------------------------
+// Global Variables
+// -----------------------------------------------------------------------
+var fileInfo = {};
+var dataset = {};
 
+// -----------------------------------------------------------------------
+// Type checking function
+// -----------------------------------------------------------------------
+
+var isInt = function(n) {
+    return Number(n) === n && n % 1 === 0;
+}
+
+var isFloat = function(n) {
+    return Number(n) === n && n % 1 !== 0;
+}
+
+var isDate = function(d) {
+    return !isNaN(Date.parse(d));
+}
+
+// -----------------------------------------------------------------------
+// File Input & Parsing
+// -----------------------------------------------------------------------
 var reader = new FileReader();
-var fileSize;
-var fileName;
-var fileType;
-var dataset;
 
 function loadFile() {
     console.log("Loading file ... ");
     var file = document.getElementById('fileInput').files[0];
     reader.addEventListener('load', parseFile, false);
     if (file) {
-        fileName = file.name;
-        fileSize = file.size;
-        fileType = file.type;
-        reader.readAsText(file);
-        printFileDetails();
+        fileInfo.name = file.name;
+        fileInfo.size = file.size;
+        fileInfo.type = file.type;
+        reader.readAsText(file); // result is stored in reader.result
+        printFileDetails(fileInfo);
     }
 }
 
 function parseFile() {
     console.log("Parsing file ... ");
-    dataset = d3.csv.parse(reader.result);
+    // Default D3 parsing
+    // dataset.data = d3.csv.parse(reader.result);
+
+    // Papa Parsing
+    dataset.data = Papa.parse(reader.result, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true
+    }).data
+
+    // Collect information about the data
+    collectDataInfo();
+
     printFile(dataset);
+    makeClassPieChart(200, 200);
 }
 
-var printFileDetails = function() {
-    console.log(fileName);
-    console.log(fileSize);
-    d3.select('body').append('p').text('File Name: ' + fileName);
-    d3.select('body').append('p').text('File Size: ' + fileSize + 'bytes');
-    d3.select('body').append('p').text('File Type: ' + fileType);
+var printFileDetails = function(f) {
+    console.log(f.name);
+    console.log(f.size);
+    d3.select('body').append('p').text('File Name: ' + f.name);
+    d3.select('body').append('p').text('File Size: ' + f.size + 'bytes');
+    d3.select('body').append('p').text('File Type: ' + f.type);
 }
 
-var printFile = function(data) {
-    // Get a list of keys
-    var keys = [];
-    for (var key in data[0]) {
-        if (data[0].hasOwnProperty(key)) keys.push(key);
+
+var collectDataInfo = function() {
+    // Get a list of column names
+    // If there are spaces around the columns, those are preserved.
+    dataset.columnNames = [];
+    for (var key in dataset.data[0]) {
+        if (dataset.data[0].hasOwnProperty(key)) dataset.columnNames.push(key);
     }
-    console.log(keys);
+
+    // Get number of rows and columns
+    dataset.ncol = dataset.columnNames.length;
+    dataset.nrow = dataset.data.length;
+
+    // Isolate the columns into lists
+    dataset.listData = {};
+    for (var i = 0; i < dataset.ncol; i++) {
+        dataset.listData[dataset.columnNames[i]] = [];
+        for (var j = 0; j < dataset.nrow; j++) {
+            dataset.listData[dataset.columnNames[i]].push(dataset.data[j][dataset.columnNames[i]])
+        }
+    }
+
+
+    // Get type of each column
+    // Data cannot contain missing values for now.
+    dataset.jsTypes = [];
+    dataset.types = [];
+    for (var i = 0; i < dataset.ncol; i++) {
+        // Get JS types
+        dataset.jsTypes[i] = typeof(dataset.data[0][dataset.columnNames[i]]);
+        dataset.types[i] = dataset.jsTypes[i];
+
+        // Get more accurate types
+        if (dataset.jsTypes[i] == "number") {
+            // Check whether this column is integer or float
+            if (dataset.listData[dataset.columnNames[i]].every(isInt)) {
+                dataset.types[i] = 'integer';
+            } else {
+                dataset.types[i] = 'float';
+            }
+        } else if (dataset.jsTypes[i] == "string") {
+            // Check if this column is a valid date
+            if (dataset.listData[dataset.columnNames[i]].every(isDate)) {
+                dataset.types[i] = 'date'
+            }
+        }
+    }
+}
+
+
+var printFile = function(ds) {
+    console.log(ds.columnNames);
 
     var columnNameString = '';
-    for(var i = 0; i < keys.length; i++) {
-        columnNameString = columnNameString + keys[i] + ' ';
+    for(var i = 0; i < ds.columnNames.length; i++) {
+        columnNameString = columnNameString + ds.columnNames[i] + ' ';
     }
     d3.select('body').append('p').text(columnNameString);
 
     d3.select('body')
-      .data(data)
+      .data(ds.data)
       .enter()
       .append('p')
       .text(function(rowObject) {
         console.log(rowObject);
         row = '';
-        for(var i = 0; i < keys.length; i++) {
-            console.log(rowObject[keys[i]]);
-            row = row + ' ' + rowObject[keys[i]];
+        for(var i = 0; i < ds.columnNames.length; i++) {
+            console.log(rowObject[ds.columnNames[i]]);
+            row = row + ' ' + rowObject[ds.columnNames[i]];
         }
         return row;
       })
 }
+
+// -----------------------------------------------------------------------
+// Class Pie Chart
+// -----------------------------------------------------------------------
+
+
+var makeClassPieChart = function(width, height) {
+    nv.addGraph(function() {
+        var classPieChartData = [];
+        for (var i = 0; i < dataset.columnNames.length; i++) {
+            classPieChartData[i] = { column: dataset.columnNames[i], value: 1 };
+        }
+
+        var chart = nv.models.pie()
+        .x(function(d) { return d.column; })
+        .y(function(d) { return d.value; })
+        .width(width)
+        .height(height)
+        .labelType('percent')
+        .valueFormat(d3.format('%'))
+        .donut(true);
+
+        d3.select("#classPieChart")
+        .datum([classPieChartData])
+        .transition().duration(1200)
+        .attr('width', width)
+        .attr('height', height)
+        .call(chart);
+
+        return chart;
+    });
+}
+
+
 
 
 // Main
