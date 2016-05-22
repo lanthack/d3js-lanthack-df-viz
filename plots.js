@@ -56,11 +56,33 @@ var makeHistogram2 = function(values) {
         .domain([0, yMax])
         .range([0.75, 0.25]); // Lightness value
 
+    var xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient("bottom")
+        .ticks(5);
+
+    var yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient("left")
+        .ticks(5);
+
     // Create an svg object
     var svg = d3.select("body")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
+
+    // Add x-axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, " + (height) + ")")
+        .call(xAxis);
+
+    // Add y-axis
+    svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(" + 0 + ", 0)")
+        .call(yAxis);
 
     // Add bars to this svg object
     svg.selectAll("rect")
@@ -82,9 +104,9 @@ var makeHistogram2 = function(values) {
         .attr("text-anchor", "middle")
         .attr("x", function(d) { return xScale(d.x) + 10; })
         .attr("y", function(d) { return height; })
-        .attr("fill", "black")
-        // .attr("y", function(d) { return height - yScale(d.y) + 14; })
-        // .attr("fill", "white")
+        // .attr("fill", "black")
+        .attr("y", function(d) { return height - yScale(d.y) + 14; })
+        .attr("fill", "white")
         .attr("font-family", "sans-serif")
         .attr("font-size", "11px")
 
