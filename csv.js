@@ -59,7 +59,7 @@ function parseFile() {
     collectDataInfo();
 
     // Debug
-    printFile(dataset);
+    // printFile(dataset);
 
     // Make the plots
     makeClassPieChart(350, 350);
