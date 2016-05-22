@@ -23,6 +23,52 @@
 //     });
 // }
 
+var makeScatterChartByIndex = function(values, columnName) {
+    console.log(values);
+    var prepData = function(values) {
+        var data = [];
+        data.push({
+            key: columnName,
+            values: []
+        });
+        for (var j = 0; j < values.length; j++) {
+            data[0].values.push({
+                x: j,
+                y: values[j],
+                size: 5,
+                shape: "circle"
+            });
+        }
+        return data;
+    }
+
+    var chart;
+    nv.addGraph(function() {
+        chart = nv.models.scatterChart()
+            .showDistX(true)
+            .showXAxis(false)
+            .showDistY(false)
+            .duration(300)
+            .color(d3.scale.category10().range());
+
+        // Send a message when the plot is ready
+        chart.dispatch.on('renderEnd', function(){
+            console.log('render complete');
+        });
+        chart.xAxis.tickFormat(d3.format('d'));
+        chart.yAxis.tickFormat(d3.format('.02f'));
+
+        d3.select('#scatterChart')
+            .datum(nv.log(prepData(values)))
+            .call(chart);
+        nv.utils.windowResize(chart.update);
+        chart.dispatch.on('stateChange', function(e) { nv.log('New State:', JSON.stringify(e)); });
+        return chart;
+    });
+    console.log("finished");
+}
+
+
 var makeHistogram = function(values) {
     // values = dataset.listData[dataset.columnNames[0]];
     // values = d3.range(1000).map(d3.random.normal(0, 1));
