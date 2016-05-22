@@ -74,9 +74,9 @@ function parseFile() {
 var printFileDetails = function(f) {
     console.log(f.name);
     console.log(f.size);
-    d3.select('body').append('p').text('File Name: ' + f.name);
-    d3.select('body').append('p').text('File Size: ' + f.size + ' bytes');
-    d3.select('body').append('p').text('File Type: ' + f.type);
+    document.getElementById("fileName").innerHTML = f.name;
+    document.getElementById("fileSize").innerHTML = f.size + ' bytes';
+    document.getElementById("fileType").innerHTML = f.type;
 }
 
 
