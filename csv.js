@@ -58,7 +58,8 @@ function parseFile() {
 
     // Make the plots
     // makeClassPieChart(300, 300);
-    makeHistogram2(dataset.listData[dataset.columnNames[0]]);
+    makeHistogram(dataset.listData[dataset.columnNames[0]]);
+    makeHistogram(dataset.listData[dataset.columnNames[1]]);
 }
 
 var printFileDetails = function(f) {
