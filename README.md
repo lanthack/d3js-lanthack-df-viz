@@ -1,6 +1,6 @@
 # Dataframe Visualization
 
-This code was developed as a part of a one-day [LaNT hackathon](http://lanthack.org). 
+This code was developed as a part of a one-day [RWL hackathon](http://randomwalklabs.org). 
 
 ## Aim
 Visualize any general dataframe (provided as a csv file).
@@ -8,8 +8,8 @@ Visualize any general dataframe (provided as a csv file).
 ## Demo
 1. Clone the repository and run a simple Python server
 ```
-git clone https://github.com/ankur-gupta/d3js-lanthack-df-viz.git
-cd d3js-lanthack-df-viz
+git clone https://github.com/ankur-gupta/d3js-df-viz.git
+cd d3js-df-viz
 python -m SimpleHTTPServer 8000
 ```
 
